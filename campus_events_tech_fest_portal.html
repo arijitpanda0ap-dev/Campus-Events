@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IEM-UEM Campus Events & Innovation Hub</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Three.js for Interactive 3D Background -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            campus: {
+              indigo: '#1e1b4b',
+              blue: '#2563eb',
+              electric: '#3b82f6',
+              accent: '#6366f1',
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased transition-colors duration-300 selection:bg-blue-600 selection:text-white">
+
+  <!-- Toast Notification Container (Replaces alert()) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-white/85 dark:bg-slate-900/85 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <!-- Brand Logo with Official IEM & UEM University Logos -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="flex items-center -space-x-2">
+            <!-- IEM Official Logo Badge -->
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform z-10 overflow-hidden" title="Institute of Engineering & Management (IEM)">
+              <img
+                src="https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg"
+                alt="IEM Logo"
+                onerror="this.onerror=null;this.src='https://placehold.co/80x80/1e3a8a/ffffff?text=IEM';"
+                class="w-full h-full object-contain rounded-lg"
+              />
+            </div>
+            <!-- UEM Official Logo Badge -->
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700 group-hover:translate-x-1 transition-transform overflow-hidden" title="University of Engineering & Management (UEM)">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                alt="UEM Logo"
+                onerror="this.onerror=null;this.src='https://placehold.co/80x80/0f172a/22d3ee?text=UEM';"
+                class="w-full h-full object-contain rounded-lg"
+              />
+            </div>
+          </div>
+          <div>
+            <span class="block font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white leading-none">
+              IEM-UEM <span class="text-blue-600 dark:text-blue-400">Events</span>
+            </span>
+            <span class="block text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-0.5">
+              Good Education, Good Jobs
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
+          <a href="#events-section" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Explore Events</a>
+          <a href="#featured-spotlight" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Flagship Fest</a>
+          <a href="#clubs-section" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Student Chapters</a>
+          <button onclick="openMyPassesModal()" class="inline-flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <i class="fa-solid fa-ticket text-blue-600 dark:text-blue-400"></i>
+            <span>My Passes</span>
+            <span id="nav-pass-count" class="ml-0.5 px-1.5 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-bold">0</span>
+          </button>
+        </nav>
+
+        <!-- Action Controls -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Mobile My Passes Button -->
+          <button onclick="openMyPassesModal()" aria-label="My Passes" class="md:hidden relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-ticket"></i>
+            <span id="mobile-pass-count" class="absolute -top-1 -right-1 w-4 h-4 text-[10px] flex items-center justify-center rounded-full bg-blue-600 text-white font-bold">0</span>
+          </button>
+
+          <!-- Theme Toggle Button -->
+          <button id="theme-toggle" aria-label="Toggle Dark Mode" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i id="theme-icon" class="fa-solid fa-moon text-base"></i>
+          </button>
+
+          <!-- Host an Event CTA -->
+          <button onclick="openHostModal()" class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all">
+            <i class="fa-solid fa-plus"></i>
+            <span>Host Event</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section with Interactive 3D WebGL Particle & Geometric Depth Field -->
+  <section id="hero-3d-section" class="relative overflow-hidden bg-slate-950 text-white py-16 sm:py-24">
+    <!-- Interactive 3D Canvas Container -->
+    <div id="hero-3d-canvas" class="absolute inset-0 w-full h-full z-0"></div>
+    <!-- Subtle Vignette Overlay for Text Contrast -->
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/75 pointer-events-none z-0"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 text-center lg:text-left">
+          <!-- Institutional Co-Branded Pill with SVG Logos -->
+          <div class="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-cyan-200 text-xs sm:text-sm font-semibold mb-6">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>IEM Kolkata × UEM Kolkata • Annual Tech & Cultural Season</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            Where Campus <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300">Innovation</span> Meets Unforgettable Moments.
+          </h1>
+
+          <p class="mt-5 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            Discover hackathons, coding sprints, cultural fests, robotics workshops, and industry seminars across IEM & UEM campuses. Register in one click and claim your instant digital pass.
+          </p>
+
+          <!-- Hero CTA Buttons -->
+          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <a href="#events-section" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-blue-600/30 transition-all hover:-translate-y-0.5">
+              <span>Explore All Events</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <button onclick="openHostModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-sm sm:text-base backdrop-blur-sm transition-all">
+              <i class="fa-solid fa-calendar-plus text-cyan-400"></i>
+              <span>Submit Campus Event</span>
+            </button>
+          </div>
+
+          <!-- Campus Highlights Strip (No Registration or Seat Counts) -->
+          <div class="mt-12 grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-white/15 max-w-xl mx-auto lg:mx-0">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-cyan-300 shrink-0">
+                <i class="fa-solid fa-building-columns"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-sm sm:text-base font-extrabold text-white">Salt Lake</div>
+                <div class="text-[11px] sm:text-xs text-slate-300">IEM Campuses</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
+                <i class="fa-solid fa-landmark"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-sm sm:text-base font-extrabold text-white">New Town</div>
+                <div class="text-[11px] sm:text-xs text-slate-300">UEM Campus</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0">
+                <i class="fa-solid fa-certificate"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-sm sm:text-base font-extrabold text-white">MAR Points</div>
+                <div class="text-[11px] sm:text-xs text-slate-300">Verified E-Pass</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Spotlight Card (Clean Status Badges, No Seat Numbers/Progress Bars) -->
+        <div id="featured-spotlight" class="lg:col-span-5">
+          <div class="rounded-3xl bg-slate-900/75 backdrop-blur-xl border border-white/15 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <!-- Top Emblem & Status Row -->
+            <div class="flex items-center justify-between gap-2 mb-5">
+              <span class="px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-bolt mr-1"></i> Flagship Hackathon
+              </span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
+                Open for Registration
+              </span>
+            </div>
+
+            <!-- Custom IEM-UEM Co-Hosted Visual Banner Illustration -->
+            <div class="mb-5 rounded-2xl bg-gradient-to-r from-indigo-900/90 via-blue-900/90 to-cyan-900/90 border border-white/10 p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="flex items-center -space-x-2 shrink-0">
+                  <div class="w-10 h-10 rounded-xl bg-white p-1 shadow border border-white/30 z-10 overflow-hidden">
+                    <img
+                      src="https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg"
+                      alt="IEM Logo"
+                      onerror="this.onerror=null;this.src='https://placehold.co/80x80/1e3a8a/ffffff?text=IEM';"
+                      class="w-full h-full object-contain rounded-lg"
+                    />
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-white p-1 shadow border border-white/30 overflow-hidden">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                      alt="UEM Logo"
+                      onerror="this.onerror=null;this.src='https://placehold.co/80x80/0f172a/22d3ee?text=UEM';"
+                      class="w-full h-full object-contain rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div class="text-[11px] uppercase tracking-widest text-cyan-300 font-bold">IEM × UEM Joint Flagship</div>
+                  <div class="text-sm font-extrabold text-white">24-Hr National Innovation Sprint</div>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-white/10 text-cyan-200 text-xs font-bold">Free Entry</span>
+            </div>
+
+            <h2 class="text-2xl font-extrabold text-white">IEM-UEM HackOverflow 4.0</h2>
+            <p class="mt-2 text-sm text-slate-300 leading-relaxed">
+              Build real-world AI, FinTech, and Web3 prototypes alongside top student developers. ₹1,50,000 prize pool & direct internship interviews.
+            </p>
+
+            <div class="mt-5 space-y-2.5 text-xs sm:text-sm text-slate-200">
+              <div class="flex items-center gap-2.5">
+                <i class="fa-regular fa-calendar text-cyan-400 w-4"></i>
+                <span>Nov 28 – Nov 29, 2026 • 09:00 AM IST</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-location-dot text-cyan-400 w-4"></i>
+                <span>Management House Auditorium, Salt Lake Sector V</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-users text-cyan-400 w-4"></i>
+                <span>Organized by IEEE Student Branch & GDG Campus</span>
+              </div>
+            </div>
+
+            <button onclick="openEventModal(1)" class="mt-7 w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2">
+              <span>Register Team / Solo Now</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Events Explorer Section -->
+  <main id="events-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <!-- Section Header & View Toggle -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Live Campus Feed</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+          Upcoming Campus Events
+        </h2>
+      </div>
+
+      <!-- View Mode Switcher (Grid vs Schedule Timeline) -->
+      <div class="inline-flex p-1 rounded-xl bg-slate-200/80 dark:bg-slate-800 self-start md:self-auto">
+        <button id="btn-grid-view" onclick="switchView('grid')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm transition-all">
+          <i class="fa-solid fa-grip"></i>
+          <span>Grid View</span>
+        </button>
+        <button id="btn-timeline-view" onclick="switchView('timeline')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+          <i class="fa-solid fa-timeline"></i>
+          <span>Schedule Timeline</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Bar & Category Filter Pills -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm mb-8">
+      <div class="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+        <!-- Real-Time Search Input -->
+        <div class="relative flex-1 max-w-xl">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input
+            type="text"
+            id="search-input"
+            oninput="handleSearch(this.value)"
+            placeholder="Search events by title, club, venue, or tag..."
+            class="w-full pl-11 pr-10 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
+          />
+          <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div id="category-filters" class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
+          <button data-cat="All" onclick="setCategory('All')" class="cat-pill active whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white shadow-sm transition-all">
+            All Events
+          </button>
+          <button data-cat="Tech & Hackathons" onclick="setCategory('Tech & Hackathons')" class="cat-pill whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-code mr-1.5 text-blue-500"></i>Tech & Hackathons
+          </button>
+          <button data-cat="Cultural" onclick="setCategory('Cultural')" class="cat-pill whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-music mr-1.5 text-pink-500"></i>Cultural
+          </button>
+          <button data-cat="Workshops" onclick="setCategory('Workshops')" class="cat-pill whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-microchip mr-1.5 text-emerald-500"></i>Workshops
+          </button>
+          <button data-cat="Sports" onclick="setCategory('Sports')" class="cat-pill whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i>Sports
+          </button>
+          <button data-cat="Seminars" onclick="setCategory('Seminars')" class="cat-pill whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-microphone-lines mr-1.5 text-purple-500"></i>Seminars
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filter Result Count -->
+    <div class="flex items-center justify-between mb-6 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+      <p id="results-summary">Showing all upcoming campus events</p>
+      <button id="reset-filters-btn" onclick="resetAllFilters()" class="hidden text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+        Reset Filters
+      </button>
+    </div>
+
+    <!-- Grid View Container -->
+    <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- Schedule Timeline View Container -->
+    <div id="events-timeline" class="hidden space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-blue-600 before:via-indigo-500 before:to-slate-300 dark:before:to-slate-800">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16 px-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+      <div class="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl mx-auto mb-4">
+        <i class="fa-regular fa-calendar-xmark"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">No matching campus events found</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+        Try clearing your search query or switching to another event category.
+      </p>
+      <button onclick="resetAllFilters()" class="mt-5 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">
+        Show All Events
+      </button>
+    </div>
+  </main>
+
+  <!-- Campus Institutions & Student Chapters Banner -->
+  <section id="clubs-section" class="bg-slate-100/80 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800 py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Dual Institutional Identity Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-5">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2 shrink-0 shadow-md border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+            <img
+              src="https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg"
+              alt="Institute of Engineering & Management Logo"
+              onerror="this.onerror=null;this.src='https://placehold.co/100x100/1e3a8a/ffffff?text=IEM';"
+              class="w-full h-full object-contain rounded-xl"
+            />
+          </div>
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-bold uppercase">Salt Lake, Sector V</span>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white mt-1">Institute of Engineering & Management (IEM)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gurukul, Management House & Ashram Campuses • Technical & Management Societies</p>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-5">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2 shrink-0 shadow-md border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+              alt="University of Engineering & Management Logo"
+              onerror="this.onerror=null;this.src='https://placehold.co/100x100/0f172a/22d3ee?text=UEM';"
+              class="w-full h-full object-contain rounded-xl"
+            />
+          </div>
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 text-[11px] font-bold uppercase">New Town, Action Area III</span>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white mt-1">University of Engineering & Management (UEM)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Innovation Labs, Open Amphitheatre & Sports Arena • Cultural & Research Chapters</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">Powered by Active Campus Communities</h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Student chapters & societies driving technical excellence, arts, and athletics across IEM & UEM.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 text-center">
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-microchip text-xl text-blue-600 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">IEEE Student Branch</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-terminal text-xl text-emerald-500 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">GDG on Campus</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-robot text-xl text-indigo-500 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">IEM Robotics Club</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-masks-theater text-xl text-pink-500 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">Ecstasia Cultural</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-lightbulb text-xl text-amber-500 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">UEM E-Cell</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <i class="fa-solid fa-basketball text-xl text-orange-500 mb-2"></i>
+          <div class="font-bold text-xs sm:text-sm">Sports Council</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clean Collegiate Footer -->
+  <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-200 dark:border-slate-800">
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center -space-x-2">
+              <div class="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center shadow border border-slate-200 dark:border-slate-700 z-10 overflow-hidden">
+                <img
+                  src="https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg"
+                  alt="IEM Logo"
+                  onerror="this.onerror=null;this.src='https://placehold.co/80x80/1e3a8a/ffffff?text=IEM';"
+                  class="w-full h-full object-contain rounded-lg"
+                />
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center shadow border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                  alt="UEM Logo"
+                  onerror="this.onerror=null;this.src='https://placehold.co/80x80/0f172a/22d3ee?text=UEM';"
+                  class="w-full h-full object-contain rounded-lg"
+                />
+              </div>
+            </div>
+            <span class="font-extrabold text-lg text-slate-900 dark:text-white">IEM-UEM Campus Events</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">
+            Centralized student event discovery, hackathon registration, and club management portal for Institute of Engineering & Management and University of Engineering & Management.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-sm text-slate-900 dark:text-white mb-3">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+            <li><a href="#events-section" class="hover:text-blue-600 dark:hover:text-blue-400">Browse All Events</a></li>
+            <li><button onclick="openHostModal()" class="hover:text-blue-600 dark:hover:text-blue-400">Host an Event</button></li>
+            <li><button onclick="openMyPassesModal()" class="hover:text-blue-600 dark:hover:text-blue-400">Download Entry Passes</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-sm text-slate-900 dark:text-white mb-3">Campus Venues</h4>
+          <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+            <li>Salt Lake Sector V, Kolkata</li>
+            <li>New Town Action Area III, Kolkata</li>
+            <li>Student Affairs Helpdesk: events@iem-uem.edu.in</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <p>© 2026 IEM-UEM Campus Innovation Hub. Created by Arijit Panda</p>
+        <div class="flex items-center gap-4">
+          <a href="#events-section" class="hover:text-blue-600">Code of Conduct</a>
+          <a href="#events-section" class="hover:text-blue-600">Organizer Guidelines</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: EVENT DETAILS & LIVE REGISTRATION MODAL                      -->
+  <!-- ===================================================================== -->
+  <div id="event-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
+    <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8 animate-fadeIn">
+      <!-- Dynamic Gradient Banner with Institutional Crest -->
+      <div id="modal-banner" class="relative h-44 sm:h-48 bg-gradient-to-r from-indigo-600 to-blue-600 p-6 flex flex-col justify-between text-white overflow-hidden">
+        <!-- Decorative SVG Backdrop -->
+        <div id="modal-svg-art" class="absolute right-4 bottom-2 opacity-20 pointer-events-none"></div>
+        <div class="flex items-center justify-between relative z-10">
+          <div class="flex items-center gap-2">
+            <span id="modal-category" class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider">
+              Tech & Hackathons
+            </span>
+            <span id="modal-campus-badge" class="px-2.5 py-1 rounded-full bg-black/25 backdrop-blur-md text-xs font-bold">
+              IEM Campus
+            </span>
+          </div>
+          <button onclick="closeEventModal()" aria-label="Close modal" class="w-9 h-9 rounded-full bg-black/25 hover:bg-black/40 text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="relative z-10">
+          <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold leading-tight">Event Title</h3>
+          <p id="modal-club" class="text-xs sm:text-sm text-white/90 font-medium mt-1">Organized by Club</p>
+        </div>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div class="p-6 sm:p-8 max-h-[75vh] overflow-y-auto">
+        <!-- Quick Meta Pills (No Seat Counts) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Date & Time</div>
+            <div id="modal-datetime" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5">Nov 28, 9:00 AM</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Campus Venue</div>
+            <div id="modal-venue" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5">Auditorium</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Registration Status</div>
+            <div id="modal-status-badge" class="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+              <i class="fa-solid fa-circle-check mr-1"></i>Open for Registration
+            </div>
+          </div>
+        </div>
+
+        <!-- Description & Rules -->
+        <div class="space-y-4 mb-6">
+          <div>
+            <h4 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1.5">About the Event</h4>
+            <p id="modal-description" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div class="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
+              <h5 class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 mb-2">
+                <i class="fa-solid fa-list-check mr-1.5"></i>Guidelines & Rules
+              </h5>
+              <ul id="modal-rules" class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 list-disc list-inside"></ul>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50">
+              <h5 class="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300 mb-2">
+                <i class="fa-solid fa-headset mr-1.5"></i>Student Coordinator
+              </h5>
+              <p id="modal-coordinator" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100"></p>
+              <p id="modal-contact" class="text-xs text-slate-500 dark:text-slate-400 mt-1"></p>
+              <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">
+                <i class="fa-solid fa-certificate mr-1"></i>MAR Points & E-Certificate Eligible
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Form Section -->
+        <div id="registration-form-wrapper" class="pt-5 border-t border-slate-200 dark:border-slate-800">
+          <h4 class="text-base font-extrabold text-slate-900 dark:text-white mb-4">
+            Complete Student Registration
+          </h4>
+          <form id="registration-form" onsubmit="submitRegistration(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Full Name *</label>
+              <input type="text" id="reg-name" required placeholder="e.g., Aarav Sharma" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">University Roll / Enrollment ID *</label>
+              <input type="text" id="reg-roll" required placeholder="e.g., 12023002014089" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Department & Year *</label>
+              <select id="reg-dept" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="CSE (2nd Year)">CSE (2nd Year)</option>
+                <option value="CSE (3rd Year)">CSE (3rd Year)</option>
+                <option value="IT (2nd Year)">IT (2nd Year)</option>
+                <option value="ECE (3rd Year)">ECE (3rd Year)</option>
+                <option value="CSE - AI & ML">CSE - AI & ML</option>
+                <option value="BBA / MBA">BBA / MBA</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">College Email *</label>
+              <input type="email" id="reg-email" required placeholder="aarav.cse@iem.edu.in" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div class="sm:col-span-2 pt-2">
+              <button type="submit" id="reg-submit-btn" class="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-ticket"></i>
+                <span>Confirm Seat & Generate Digital Pass</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Digital Confirmation Ticket View (Shown immediately after registration) -->
+        <div id="registration-ticket-wrapper" class="hidden pt-5 border-t border-slate-200 dark:border-slate-800">
+          <div class="rounded-2xl bg-gradient-to-br from-emerald-500/10 via-blue-500/10 to-indigo-500/10 border-2 border-dashed border-blue-500/40 p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-200 dark:border-slate-700">
+              <div class="flex items-center gap-3">
+                <!-- IEM-UEM Official Logos on Digital Pass -->
+                <div class="flex items-center -space-x-1.5 shrink-0">
+                  <div class="w-9 h-9 rounded-xl bg-white p-1 shadow border border-slate-200 z-10 overflow-hidden">
+                    <img
+                      src="https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg"
+                      alt="IEM Logo"
+                      onerror="this.onerror=null;this.src='https://placehold.co/80x80/1e3a8a/ffffff?text=IEM';"
+                      class="w-full h-full object-contain rounded-lg"
+                    />
+                  </div>
+                  <div class="w-9 h-9 rounded-xl bg-white p-1 shadow border border-slate-200 overflow-hidden">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                      alt="UEM Logo"
+                      onerror="this.onerror=null;this.src='https://placehold.co/80x80/0f172a/22d3ee?text=UEM';"
+                      class="w-full h-full object-contain rounded-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">IEM-UEM Official Digital Pass</h4>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Present this pass ID at the venue check-in desk</p>
+                </div>
+              </div>
+              <span id="ticket-pass-id" class="px-3 py-1 rounded-lg bg-blue-600 text-white font-mono text-xs font-bold tracking-wider">
+                #IEM-8492
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 py-4 text-xs">
+              <div>
+                <span class="text-slate-400 block">Attendee</span>
+                <span id="ticket-student-name" class="font-bold text-slate-900 dark:text-white text-sm"></span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Roll / ID</span>
+                <span id="ticket-student-roll" class="font-bold text-slate-900 dark:text-white text-sm"></span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Department</span>
+                <span id="ticket-student-dept" class="font-bold text-slate-900 dark:text-white text-sm"></span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <button onclick="copyPassCode()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:opacity-90 transition">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy Pass ID</span>
+              </button>
+              <button onclick="closeEventModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: SUBMIT / HOST AN EVENT MODAL                                 -->
+  <!-- ===================================================================== -->
+  <div id="host-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
+    <div class="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+      <div class="px-6 py-5 bg-gradient-to-r from-indigo-900 to-blue-800 text-white flex items-center justify-between">
+        <div>
+          <h3 class="text-lg sm:text-xl font-extrabold">Publish a Campus Event</h3>
+          <p class="text-xs text-blue-200 mt-0.5">Add your club workshop, hackathon, or fest directly to the live feed</p>
+        </div>
+        <button onclick="closeHostModal()" aria-label="Close modal" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="host-event-form" onsubmit="submitNewEvent(event)" class="p-6 sm:p-7 space-y-4 max-h-[78vh] overflow-y-auto">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Event Title *</label>
+          <input type="text" id="host-title" required placeholder="e.g., Cloud Native & Docker Bootcamp" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Category *</label>
+            <select id="host-category" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+              <option value="Tech & Hackathons">Tech & Hackathons</option>
+              <option value="Workshops">Workshops</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Sports">Sports</option>
+              <option value="Seminars">Seminars</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Organizing Club / Chapter *</label>
+            <input type="text" id="host-club" required placeholder="e.g., GDG on Campus IEM" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Date & Time *</label>
+            <input type="text" id="host-datetime" required placeholder="e.g., Dec 12, 2026 • 02:00 PM" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Entry & Registration Type *</label>
+            <select id="host-entry-type" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+              <option value="Open for Registration">Open for Registration</option>
+              <option value="Free Entry">Free Entry</option>
+              <option value="Team Registration">Team Registration</option>
+              <option value="Solo Participation">Solo Participation</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Campus Venue *</label>
+            <input type="text" id="host-venue" required placeholder="e.g., CII Auditorium, Gurukul Campus" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Student Coordinator & Phone *</label>
+            <input type="text" id="host-coordinator" required placeholder="e.g., Riya Sen (+91 98300 XXXXX)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Event Description *</label>
+          <textarea id="host-description" rows="3" required placeholder="Describe what participants will learn, build, or experience..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeHostModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-600/25 transition">
+            Publish Event Live
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: MY REGISTERED PASSES WALLET                                  -->
+  <!-- ===================================================================== -->
+  <div id="passes-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
+    <div class="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+      <div class="px-6 py-5 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-ticket text-cyan-400 text-lg"></i>
+          <h3 class="text-lg font-extrabold">My Digital Event Passes</h3>
+        </div>
+        <button onclick="closeMyPassesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="passes-list-container" class="p-6 max-h-[65vh] overflow-y-auto space-y-4">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. INITIAL CAMPUS EVENTS DATASET (Clean Status Badges, No Seat Counts)
+    // =========================================================================
+    const initialEvents = [
+      {
+        id: 1,
+        title: "IEM-UEM HackOverflow 4.0",
+        category: "Tech & Hackathons",
+        campus: "IEM Salt Lake",
+        club: "IEEE Student Branch & GDG Campus",
+        date: "Nov 28, 2026",
+        time: "09:00 AM IST",
+        venue: "Management House Auditorium, Sec V",
+        statusLabel: "Open for Registration",
+        gradient: "from-indigo-600 via-blue-600 to-cyan-500",
+        icon: "fa-laptop-code",
+        featured: true,
+        coordinator: "Ankit Chatterjee",
+        contact: "+91 98312 44019 • ieee@iem.edu.in",
+        description: "Our flagship 24-hour inter-college hackathon bringing together student innovators to solve real-world challenges in AI/ML, FinTech, Healthcare, and Sustainable Smart Cities.",
+        rules: [
+          "Teams of 2 to 4 students from any recognized college.",
+          "Bring your own laptops, chargers, and valid college ID card.",
+          "All code must be written during the 24-hour sprint window."
+        ]
+      },
+      {
+        id: 2,
+        title: "Ecstasia Unplugged: Battle of Bands",
+        category: "Cultural",
+        campus: "UEM New Town",
+        club: "Ecstasia Cultural Society",
+        date: "Dec 02, 2026",
+        time: "04:30 PM IST",
+        venue: "UEM Open Air Amphitheatre, New Town",
+        statusLabel: "Free Entry",
+        gradient: "from-fuchsia-600 via-pink-600 to-rose-500",
+        icon: "fa-guitar",
+        featured: true,
+        coordinator: "Sneha Mukherjee",
+        contact: "+91 90511 78230 • ecstasia@uem.edu.in",
+        description: "An electrifying evening of live indie rock, classical fusion, and acoustic performances by campus bands competing for the Ecstasia Trophy and studio recording vouchers.",
+        rules: [
+          "Maximum 12 minutes stage time including soundcheck.",
+          "Standard drum kit and amplifiers will be provided on stage.",
+          "Audience entry strictly with valid digital student pass."
+        ]
+      },
+      {
+        id: 3,
+        title: "Generative AI & RAG Systems Workshop",
+        category: "Workshops",
+        campus: "IEM Gurukul",
+        club: "IEM AI & Data Science Society",
+        date: "Dec 05, 2026",
+        time: "11:00 AM IST",
+        venue: "Smart Lab 402, Gurukul Building",
+        statusLabel: "Open for Registration",
+        gradient: "from-emerald-600 via-teal-600 to-cyan-600",
+        icon: "fa-brain",
+        featured: false,
+        coordinator: "Rohan Dasgupta",
+        contact: "+91 98745 11029 • aidata@iem.edu.in",
+        description: "Hands-on technical bootcamp covering LLM fine-tuning, vector databases, and deploying Retrieval-Augmented Generation pipelines from scratch using Python.",
+        rules: [
+          "Basic familiarity with Python is recommended.",
+          "Pre-install VS Code and Python 3.10+ before arriving.",
+          "Participants receive hands-on lab credits and completion badge."
+        ]
+      },
+      {
+        id: 4,
+        title: "RoboSoccer & Line Follower Grand Prix",
+        category: "Tech & Hackathons",
+        campus: "IEM Ashram",
+        club: "IEM-UEM Robotics Club",
+        date: "Dec 08, 2026",
+        time: "10:30 AM IST",
+        venue: "Central Courtyard, Ashram Campus",
+        statusLabel: "Team Registration",
+        gradient: "from-blue-700 via-indigo-700 to-violet-600",
+        icon: "fa-robot",
+        featured: false,
+        coordinator: "Sourav Mondal",
+        contact: "+91 89102 33418 • robotics@iem.edu.in",
+        description: "Test your autonomous PID controllers and custom wireless bots in high-speed track races and 2v2 robotic soccer knockouts.",
+        rules: [
+          "Bot dimensions must not exceed 25cm x 25cm x 20cm.",
+          "Maximum onboard battery voltage capped at 12V DC.",
+          "Wireless bots must support dual-frequency pairing."
+        ]
+      },
+      {
+        id: 5,
+        title: "Inter-Department Futsal Championship",
+        category: "Sports",
+        campus: "UEM New Town",
+        club: "Campus Sports Council",
+        date: "Dec 11, 2026",
+        time: "03:00 PM IST",
+        venue: "UEM Floodlit Turf Arena",
+        statusLabel: "Open for Registration",
+        gradient: "from-amber-500 via-orange-600 to-red-600",
+        icon: "fa-futbol",
+        featured: false,
+        coordinator: "Vikramaditya Roy",
+        contact: "+91 98360 99210 • sports@uem.edu.in",
+        description: "Fast-paced 5-a-side knockout futsal tournament across CSE, IT, ECE, Mechanical, and Management departments.",
+        rules: [
+          "5 playing members + 2 rolling substitutes per squad.",
+          "Non-marking turf shoes or flat-sole sneakers mandatory.",
+          "15-minute halves with sudden-death penalties on draws."
+        ]
+      },
+      {
+        id: 6,
+        title: "Founder's Fireside: From Dorm Room to Seed Round",
+        category: "Seminars",
+        campus: "IEM Salt Lake",
+        club: "UEM Entrepreneurship Cell (E-Cell)",
+        date: "Dec 14, 2026",
+        time: "02:00 PM IST",
+        venue: "CII Seminar Hall, Salt Lake",
+        statusLabel: "Free Entry",
+        gradient: "from-purple-600 via-violet-600 to-indigo-600",
+        icon: "fa-rocket",
+        featured: false,
+        coordinator: "Priyanka Bose",
+        contact: "+91 98301 55412 • ecell@uem.edu.in",
+        description: "Interactive keynote and live startup pitch clinic featuring IEM-UEM alumni founders and angel investors from Kolkata & Bengaluru.",
+        rules: [
+          "Open to all undergraduate and postgraduate students.",
+          "Selected student teams get 5 minutes for live pitch feedback.",
+          "Networking high-tea follows the panel discussion."
+        ]
+      },
+      {
+        id: 7,
+        title: "UI/UX Designathon & Figma Jam",
+        category: "Workshops",
+        campus: "UEM New Town",
+        club: "Design & Media Collective",
+        date: "Dec 17, 2026",
+        time: "10:00 AM IST",
+        venue: "Innovation Studio, Block B",
+        statusLabel: "Open for Registration",
+        gradient: "from-cyan-600 via-sky-600 to-blue-600",
+        icon: "fa-pen-nib",
+        featured: false,
+        coordinator: "Tanya Sen",
+        contact: "+91 91632 77890 • design@iem.edu.in",
+        description: "Learn modern design systems, micro-interactions, and accessibility before competing in a 4-hour mobile app redesign sprint.",
+        rules: [
+          "Create a free Figma Education account prior to the session.",
+          "Solo or duo participation allowed.",
+          "Top 3 prototypes win design goodies and club fellowships."
+        ]
+      },
+      {
+        id: 8,
+        title: "Shutterbugs Campus Photowalk & Exhibition",
+        category: "Cultural",
+        campus: "IEM Salt Lake",
+        club: "IEM-UEM Photography & Film Club",
+        date: "Dec 19, 2026",
+        time: "07:30 AM IST",
+        venue: "Salt Lake Central Park & Campus Gallery",
+        statusLabel: "Free Entry",
+        gradient: "from-rose-600 via-pink-600 to-amber-500",
+        icon: "fa-camera-retro",
+        featured: false,
+        coordinator: "Debanjan Roy",
+        contact: "+91 98304 11223 • shutterbugs@iem.edu.in",
+        description: "Capture golden-hour street and architectural frames around Sector V followed by a curated gallery exhibition and critique session.",
+        rules: [
+          "DSLR, mirrorless, or smartphone cameras are all welcome.",
+          "Submit up to 3 unedited RAW/JPEG shots by 2:00 PM.",
+          "Best entries will be featured in the annual campus magazine."
+        ]
+      }
+    ];
+
+    // Official IEM & UEM University Logo URLs
+    const IEM_LOGO_URL = "https://irtm.smartsociety.org/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-12-at-3.04.38-PM-819x1024.jpeg";
+    const UEM_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/b/bd/University_of_Engineering_and_Management_Kolkata_logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original";
+
+    // Helper: Small Institutional Logo Badge for Event Cards & Modals
+    function getCampusCrestMini(campus) {
+      const isUEM = campus && campus.toUpperCase().includes("UEM");
+      const isJoint = campus && campus.toUpperCase().includes("IEM") && campus.toUpperCase().includes("UEM");
+
+      if (isJoint) {
+        return `<span class="inline-flex items-center -space-x-1 mr-1.5 align-middle">
+          <img src="${IEM_LOGO_URL}" alt="IEM" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1e3a8a/ffffff?text=IEM';" class="w-4 h-4 rounded-full bg-white object-contain p-0.5 border border-white/40" />
+          <img src="${UEM_LOGO_URL}" alt="UEM" onerror="this.onerror=null;this.src='https://placehold.co/40x40/0f172a/22d3ee?text=UEM';" class="w-4 h-4 rounded-full bg-white object-contain p-0.5 border border-white/40" />
+        </span>`;
+      }
+      if (isUEM) {
+        return `<img src="${UEM_LOGO_URL}" alt="UEM" onerror="this.onerror=null;this.src='https://placehold.co/40x40/0f172a/22d3ee?text=UEM';" class="w-4 h-4 inline-block mr-1.5 rounded-full bg-white object-contain p-0.5 align-middle border border-white/40" />`;
+      }
+      return `<img src="${IEM_LOGO_URL}" alt="IEM" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1e3a8a/ffffff?text=IEM';" class="w-4 h-4 inline-block mr-1.5 rounded-full bg-white object-contain p-0.5 align-middle border border-white/40" />`;
+    }
+
+    // Helper: Returns Custom SVG Illustration for Event Banners based on Category
+    function getCategoryIllustrationSVG(category) {
+      const svgs = {
+        "Tech & Hackathons": `
+          <svg viewBox="0 0 180 120" class="w-40 h-28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="18" width="140" height="84" rx="12" stroke="white" stroke-width="3" fill="white" fill-opacity="0.08"/>
+            <path d="M55 48L38 60L55 72" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M125 48L142 60L125 72" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M98 42L82 78" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+          </svg>`,
+        "Cultural": `
+          <svg viewBox="0 0 180 120" class="w-40 h-28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="90" cy="60" r="42" stroke="white" stroke-width="3" fill="white" fill-opacity="0.08"/>
+            <path d="M76 74V44L110 38V68" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="68" cy="74" r="8" fill="#FBBF24"/>
+            <circle cx="102" cy="68" r="8" fill="#38BDF8"/>
+          </svg>`,
+        "Workshops": `
+          <svg viewBox="0 0 180 120" class="w-40 h-28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="52" y="24" width="76" height="72" rx="14" stroke="white" stroke-width="3" fill="white" fill-opacity="0.08"/>
+            <circle cx="90" cy="60" r="16" stroke="#FBBF24" stroke-width="4"/>
+            <path d="M90 12V24M90 96V108M40 60H52M128 60H140" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>`,
+        "Sports": `
+          <svg viewBox="0 0 180 120" class="w-40 h-28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M64 26H116V52C116 66.3594 104.359 78 90 78C75.6406 78 64 66.3594 64 52V26Z" stroke="white" stroke-width="3.5" fill="white" fill-opacity="0.1"/>
+            <path d="M90 78V96M72 96H108" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+          </svg>`,
+        "Seminars": `
+          <svg viewBox="0 0 180 120" class="w-40 h-28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="76" y="22" width="28" height="46" rx="14" stroke="white" stroke-width="3.5" fill="white" fill-opacity="0.1"/>
+            <path d="M58 54C58 71.6731 72.3269 86 90 86C107.673 86 122 71.6731 122 54" stroke="#38BDF8" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M90 86V102M74 102H106" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>`
+      };
+      return svgs[category] || svgs["Tech & Hackathons"];
+    }
+
+    // Helper: Small Institutional Badge SVG
+    function getCampusCrestMini(campus) {
+      const isUEM = campus && campus.toUpperCase().includes("UEM");
+      if (isUEM) {
+        return `<svg viewBox="0 0 64 64" class="w-4 h-4 inline-block mr-1" fill="none"><circle cx="32" cy="32" r="26" fill="#0F172A" stroke="#22D3EE" stroke-width="4"/><path d="M21 20V35C21 41 26 46 32 46C38 46 43 41 43 35V20" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/></svg>`;
+      }
+      return `<svg viewBox="0 0 64 64" class="w-4 h-4 inline-block mr-1" fill="none"><path d="M32 4L54 13V31C54 45.5 44.5 56.5 32 60C19.5 56.5 10 45.5 10 31V13L32 4Z" fill="#1E3A8A" stroke="#60A5FA" stroke-width="4"/><path d="M22 23H42M32 23V43M22 43H42" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/></svg>`;
+    }
+
+    // =========================================================================
+    // 2. APPLICATION STATE
+    // =========================================================================
+    let events = [...initialEvents];
+    let selectedCategory = "All";
+    let searchQuery = "";
+    let currentView = "grid"; // 'grid' or 'timeline'
+    let activeModalEventId = null;
+    let lastGeneratedPassId = "";
+    let registeredPasses = []; // Stores user's registered passes
+
+    // =========================================================================
+    // 3. INITIALIZATION, 3D HERO BACKGROUND & THEME HANDLING
+    // =========================================================================
+    window.addEventListener("load", () => {
+      initTheme();
+      init3DHeroBackground();
+      renderEvents();
+      updatePassCounters();
+    });
+
+    // Interactive 3D Particle Network & Floating Geometric Depth Field (Three.js)
+    function init3DHeroBackground() {
+      const container = document.getElementById("hero-3d-canvas");
+      if (!container || typeof THREE === "undefined") return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        1000
+      );
+      camera.position.z = 32;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Group to hold 3D objects for smooth mouse-driven parallax rotation
+      const worldGroup = new THREE.Group();
+      scene.add(worldGroup);
+
+      // 1. 3D Particle Constellation Field
+      const particleCount = 260;
+      const particleGeometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      const palette = [
+        new THREE.Color("#38bdf8"), // Cyan
+        new THREE.Color("#6366f1"), // Indigo
+        new THREE.Color("#3b82f6"), // Electric Blue
+        new THREE.Color("#a5b4fc")  // Soft Periwinkle
+      ];
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 75;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 48;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 45;
+
+        const c = palette[i % palette.length];
+        colors[i * 3] = c.r;
+        colors[i * 3 + 1] = c.g;
+        colors[i * 3 + 2] = c.b;
+      }
+
+      particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      particleGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.42,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85
+      });
+
+      const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+      worldGroup.add(particleSystem);
+
+      // 2. Connecting Neural/Campus Grid Lines between nearby particles
+      const linePositions = [];
+      for (let i = 0; i < particleCount; i++) {
+        for (let j = i + 1; j < particleCount; j++) {
+          const dx = positions[i * 3] - positions[j * 3];
+          const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+          const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          if (dist < 10.5) {
+            linePositions.push(
+              positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2],
+              positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]
+            );
+          }
+        }
+      }
+
+      const lineGeometry = new THREE.BufferGeometry();
+      lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x3b82f6,
+        transparent: true,
+        opacity: 0.22
+      });
+      const lineSegments = new THREE.LineSegments(lineGeometry, lineMaterial);
+      worldGroup.add(lineSegments);
+
+      // 3. Floating 3D Geometric Polyhedra (Icosahedrons & Torus Rings)
+      const wireMeshes = [];
+      const geo1 = new THREE.IcosahedronGeometry(5.5, 1);
+      const mat1 = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.22
+      });
+      const mesh1 = new THREE.Mesh(geo1, mat1);
+      mesh1.position.set(-18, 6, -6);
+      worldGroup.add(mesh1);
+      wireMeshes.push({ mesh: mesh1, rx: 0.003, ry: 0.004 });
+
+      const geo2 = new THREE.OctahedronGeometry(4.5, 0);
+      const mat2 = new THREE.MeshBasicMaterial({
+        color: 0x818cf8,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.25
+      });
+      const mesh2 = new THREE.Mesh(geo2, mat2);
+      mesh2.position.set(19, -7, -4);
+      worldGroup.add(mesh2);
+      wireMeshes.push({ mesh: mesh2, rx: -0.004, ry: 0.003 });
+
+      const geo3 = new THREE.TorusKnotGeometry(3.2, 0.7, 64, 8);
+      const mat3 = new THREE.MeshBasicMaterial({
+        color: 0x22d3ee,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.14
+      });
+      const mesh3 = new THREE.Mesh(geo3, mat3);
+      mesh3.position.set(4, 11, -12);
+      worldGroup.add(mesh3);
+      wireMeshes.push({ mesh: mesh3, rx: 0.002, ry: -0.003 });
+
+      // 4. Interactive Cursor Glow Orb inside 3D Space
+      const cursorLight = new THREE.PointLight(0x38bdf8, 2.5, 40);
+      cursorLight.position.set(0, 0, 12);
+      scene.add(cursorLight);
+
+      // Track Normalized Mouse & Touch Coordinates for Smooth 3D Parallax Tilt
+      let targetMouseX = 0;
+      let targetMouseY = 0;
+      let currentMouseX = 0;
+      let currentMouseY = 0;
+
+      const heroSection = document.getElementById("hero-3d-section");
+
+      function updatePointerCoords(clientX, clientY) {
+        const rect = heroSection.getBoundingClientRect();
+        targetMouseX = ((clientX - rect.left) / rect.width) * 2 - 1;
+        targetMouseY = -((clientY - rect.top) / rect.height) * 2 + 1;
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        updatePointerCoords(e.clientX, e.clientY);
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        if (e.touches && e.touches.length > 0) {
+          updatePointerCoords(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      // Responsive Resize Handler
+      window.addEventListener("resize", () => {
+        if (!container) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+
+      // Continuous Animation Loop
+      let clock = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        clock += 0.008;
+
+        // Smooth damping interpolation towards pointer position
+        currentMouseX += (targetMouseX - currentMouseX) * 0.06;
+        currentMouseY += (targetMouseY - currentMouseY) * 0.06;
+
+        // Apply 3D camera parallax shift & world tilt
+        worldGroup.rotation.y = currentMouseX * 0.35 + Math.sin(clock * 0.4) * 0.08;
+        worldGroup.rotation.x = -currentMouseY * 0.25 + Math.cos(clock * 0.3) * 0.05;
+
+        camera.position.x = currentMouseX * 3.5;
+        camera.position.y = currentMouseY * 2.5;
+        camera.lookAt(0, 0, 0);
+
+        cursorLight.position.x = currentMouseX * 22;
+        cursorLight.position.y = currentMouseY * 14;
+
+        // Rotate floating geometric wireframes
+        wireMeshes.forEach((item) => {
+          item.mesh.rotation.x += item.rx;
+          item.mesh.rotation.y += item.ry;
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem("iem-uem-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const htmlEl = document.documentElement;
+      const iconEl = document.getElementById("theme-icon");
+
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        htmlEl.classList.add("dark");
+        iconEl.classList.replace("fa-moon", "fa-sun");
+      } else {
+        htmlEl.classList.remove("dark");
+        iconEl.classList.replace("fa-sun", "fa-moon");
+      }
+
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        const isDark = htmlEl.classList.toggle("dark");
+        localStorage.setItem("iem-uem-theme", isDark ? "dark" : "light");
+        if (isDark) {
+          iconEl.classList.replace("fa-moon", "fa-sun");
+        } else {
+          iconEl.classList.replace("fa-sun", "fa-moon");
+        }
+      });
+    }
+
+    // =========================================================================
+    // 4. FILTERING, SEARCH & VIEW SWITCHING
+    // =========================================================================
+    function setCategory(category) {
+      selectedCategory = category;
+
+      // Update active pill styling
+      document.querySelectorAll(".cat-pill").forEach((btn) => {
+        if (btn.dataset.cat === category) {
+          btn.classList.remove("bg-slate-100", "dark:bg-slate-800", "text-slate-700", "dark:text-slate-300");
+          btn.classList.add("bg-blue-600", "text-white", "shadow-sm");
+        } else {
+          btn.classList.add("bg-slate-100", "dark:bg-slate-800", "text-slate-700", "dark:text-slate-300");
+          btn.classList.remove("bg-blue-600", "text-white", "shadow-sm");
+        }
+      });
+
+      renderEvents();
+    }
+
+    function handleSearch(value) {
+      searchQuery = value.trim().toLowerCase();
+      const clearBtn = document.getElementById("clear-search-btn");
+      clearBtn.classList.toggle("hidden", searchQuery.length === 0);
+      renderEvents();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById("search-input");
+      input.value = "";
+      handleSearch("");
+    }
+
+    function resetAllFilters() {
+      clearSearch();
+      setCategory("All");
+    }
+
+    function switchView(view) {
+      currentView = view;
+      const gridBtn = document.getElementById("btn-grid-view");
+      const timelineBtn = document.getElementById("btn-timeline-view");
+      const gridEl = document.getElementById("events-grid");
+      const timelineEl = document.getElementById("events-timeline");
+
+      if (view === "grid") {
+        gridBtn.classList.add("bg-white", "dark:bg-slate-900", "text-blue-600", "dark:text-blue-400", "shadow-sm");
+        gridBtn.classList.remove("text-slate-600", "dark:text-slate-400");
+        timelineBtn.classList.remove("bg-white", "dark:bg-slate-900", "text-blue-600", "dark:text-blue-400", "shadow-sm");
+        timelineBtn.classList.add("text-slate-600", "dark:text-slate-400");
+        gridEl.classList.remove("hidden");
+        timelineEl.classList.add("hidden");
+      } else {
+        timelineBtn.classList.add("bg-white", "dark:bg-slate-900", "text-blue-600", "dark:text-blue-400", "shadow-sm");
+        timelineBtn.classList.remove("text-slate-600", "dark:text-slate-400");
+        gridBtn.classList.remove("bg-white", "dark:bg-slate-900", "text-blue-600", "dark:text-blue-400", "shadow-sm");
+        gridBtn.classList.add("text-slate-600", "dark:text-slate-400");
+        timelineEl.classList.remove("hidden");
+        gridEl.classList.add("hidden");
+      }
+      renderEvents();
+    }
+
+    function getFilteredEvents() {
+      return events.filter((ev) => {
+        const matchesCat = selectedCategory === "All" || ev.category === selectedCategory;
+        const matchesSearch =
+          !searchQuery ||
+          ev.title.toLowerCase().includes(searchQuery) ||
+          ev.club.toLowerCase().includes(searchQuery) ||
+          ev.venue.toLowerCase().includes(searchQuery) ||
+          ev.category.toLowerCase().includes(searchQuery) ||
+          ev.description.toLowerCase().includes(searchQuery);
+        return matchesCat && matchesSearch;
+      });
+    }
+
+    // =========================================================================
+    // 5. RENDERING GRID CARDS & TIMELINE SCHEDULE
+    // =========================================================================
+    function renderEvents() {
+      const filtered = getFilteredEvents();
+      const gridEl = document.getElementById("events-grid");
+      const timelineEl = document.getElementById("events-timeline");
+      const emptyEl = document.getElementById("empty-state");
+      const summaryEl = document.getElementById("results-summary");
+      const resetBtn = document.getElementById("reset-filters-btn");
+
+      // Update summary text
+      const isFiltered = selectedCategory !== "All" || searchQuery.length > 0;
+      resetBtn.classList.toggle("hidden", !isFiltered);
+      summaryEl.textContent = isFiltered
+        ? `Showing ${filtered.length} matching ${filtered.length === 1 ? "event" : "events"}`
+        : `Showing all ${filtered.length} upcoming campus events`;
+
+      if (filtered.length === 0) {
+        gridEl.innerHTML = "";
+        timelineEl.innerHTML = "";
+        gridEl.classList.add("hidden");
+        timelineEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      if (currentView === "grid") {
+        gridEl.classList.remove("hidden");
+        timelineEl.classList.add("hidden");
+      } else {
+        timelineEl.classList.remove("hidden");
+        gridEl.classList.add("hidden");
+      }
+
+      // Render Grid View (Clean Cards with SVG Illustrations, Crests & Status Badges - Zero Seat Numbers)
+      gridEl.innerHTML = filtered
+        .map((ev) => {
+          const isRegistered = registeredPasses.some((p) => p.eventId === ev.id);
+
+          return `
+            <article class="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+              <!-- Gradient Banner Header with Custom SVG Art -->
+              <div class="relative h-36 bg-gradient-to-r ${ev.gradient} p-5 flex flex-col justify-between text-white overflow-hidden">
+                <div class="absolute -right-2 -bottom-2 opacity-85 group-hover:scale-105 transition-transform duration-500 pointer-events-none">
+                  ${getCategoryIllustrationSVG(ev.category)}
+                </div>
+                <div class="flex items-center justify-between gap-2 relative z-10">
+                  <span class="px-3 py-1 rounded-full bg-black/25 backdrop-blur-md text-[11px] font-bold tracking-wide">
+                    ${ev.category}
+                  </span>
+                  ${
+                    isRegistered
+                      ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[11px] font-bold shadow"><i class="fa-solid fa-check mr-1"></i>Registered</span>`
+                      : `<span class="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold">${ev.statusLabel || "Open for Registration"}</span>`
+                  }
+                </div>
+                <div class="relative z-10">
+                  <span class="text-xs font-semibold text-white/95 flex items-center truncate">
+                    ${getCampusCrestMini(ev.campus)}
+                    <span class="truncate">${ev.club}</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                      ${ev.campus || "IEM-UEM Campus"}
+                    </span>
+                  </div>
+                  <h3 class="text-lg font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                    ${ev.title}
+                  </h3>
+                  <p class="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                    ${ev.description}
+                  </p>
+
+                  <!-- Date & Venue Details -->
+                  <div class="mt-4 space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                    <div class="flex items-center gap-2">
+                      <i class="fa-regular fa-calendar text-blue-600 dark:text-blue-400 w-4"></i>
+                      <span class="font-semibold">${ev.date}</span>
+                      <span class="text-slate-400">•</span>
+                      <span>${ev.time}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <i class="fa-solid fa-location-dot text-blue-600 dark:text-blue-400 w-4"></i>
+                      <span class="truncate">${ev.venue}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Clean Action Footer (No Seat Progress Bars or Numbers) -->
+                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <button onclick="openEventModal(${ev.id})" class="w-full py-2.5 px-4 rounded-xl ${
+                    isRegistered
+                      ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
+                      : "bg-slate-900 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white"
+                  } font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
+                    <span>${isRegistered ? "View Digital Ticket" : "View Details & Register"}</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      // Render Timeline View (Clean Status Badges, Zero Seat Numbers)
+      timelineEl.innerHTML = filtered
+        .map((ev) => {
+          const isRegistered = registeredPasses.some((p) => p.eventId === ev.id);
+          return `
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+              <!-- Timeline Node Dot -->
+              <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-950 bg-blue-600 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                <i class="fa-solid ${ev.icon} text-xs"></i>
+              </div>
+
+              <!-- Timeline Event Card -->
+              <div class="w-[calc(100%-3.5rem)] md:w-[calc(50%-2.5rem)] bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="text-xs font-extrabold text-blue-600 dark:text-blue-400">
+                    ${ev.date} • ${ev.time}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold">
+                    ${ev.category}
+                  </span>
+                </div>
+                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">${ev.title}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center">
+                  ${getCampusCrestMini(ev.campus)}
+                  <span>${ev.club} • <span class="font-medium text-slate-700 dark:text-slate-300">${ev.venue}</span></span>
+                </p>
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-3 line-clamp-2">${ev.description}</p>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                  <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <i class="fa-solid fa-circle-check mr-1"></i>${ev.statusLabel || "Open for Registration"}
+                  </span>
+                  <button onclick="openEventModal(${ev.id})" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">
+                    ${isRegistered ? "View Ticket" : "Register"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function updatePassCounters() {
+      document.getElementById("nav-pass-count").textContent = registeredPasses.length;
+      document.getElementById("mobile-pass-count").textContent = registeredPasses.length;
+    }
+
+    // =========================================================================
+    // 6. EVENT DETAILS & REGISTRATION MODAL LOGIC
+    // =========================================================================
+    function openEventModal(eventId) {
+      const ev = events.find((item) => item.id === eventId);
+      if (!ev) return;
+      activeModalEventId = eventId;
+
+      // Populate Modal Header & Metadata
+      const bannerEl = document.getElementById("modal-banner");
+      bannerEl.className = `relative h-44 sm:h-48 bg-gradient-to-r ${ev.gradient} p-6 flex flex-col justify-between text-white overflow-hidden`;
+
+      document.getElementById("modal-svg-art").innerHTML = getCategoryIllustrationSVG(ev.category);
+      document.getElementById("modal-category").textContent = ev.category;
+      document.getElementById("modal-campus-badge").innerHTML = `${getCampusCrestMini(ev.campus)} ${ev.campus || "IEM-UEM Campus"}`;
+      document.getElementById("modal-title").textContent = ev.title;
+      document.getElementById("modal-club").textContent = `Organized by ${ev.club}`;
+      document.getElementById("modal-datetime").textContent = `${ev.date} • ${ev.time}`;
+      document.getElementById("modal-venue").textContent = ev.venue;
+      document.getElementById("modal-status-badge").innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>${ev.statusLabel || "Open for Registration"}`;
+      document.getElementById("modal-description").textContent = ev.description;
+      document.getElementById("modal-coordinator").textContent = ev.coordinator;
+      document.getElementById("modal-contact").textContent = ev.contact;
+
+      // Populate Rules List
+      const rulesList = document.getElementById("modal-rules");
+      rulesList.innerHTML = ev.rules.map((rule) => `<li>${rule}</li>`).join("");
+
+      // Check if user already registered for this event
+      const existingPass = registeredPasses.find((p) => p.eventId === eventId);
+      const formWrapper = document.getElementById("registration-form-wrapper");
+      const ticketWrapper = document.getElementById("registration-ticket-wrapper");
+
+      if (existingPass) {
+        formWrapper.classList.add("hidden");
+        ticketWrapper.classList.remove("hidden");
+        showTicketDetails(existingPass);
+      } else {
+        formWrapper.classList.remove("hidden");
+        ticketWrapper.classList.add("hidden");
+        document.getElementById("registration-form").reset();
+      }
+
+      const modal = document.getElementById("event-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeEventModal() {
+      const modal = document.getElementById("event-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    }
+
+    function submitRegistration(e) {
+      e.preventDefault();
+      const ev = events.find((item) => item.id === activeModalEventId);
+      if (!ev) return;
+
+      const name = document.getElementById("reg-name").value.trim();
+      const roll = document.getElementById("reg-roll").value.trim();
+      const dept = document.getElementById("reg-dept").value;
+      const email = document.getElementById("reg-email").value.trim();
+
+      // Generate unique ticket pass
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const passObj = {
+        passId: `IEM-${randomNum}`,
+        eventId: ev.id,
+        eventTitle: ev.title,
+        eventDate: `${ev.date} • ${ev.time}`,
+        eventVenue: ev.venue,
+        studentName: name,
+        studentRoll: roll,
+        studentDept: dept,
+        studentEmail: email
+      };
+
+      registeredPasses.unshift(passObj);
+
+      // Update UI & Switch Modal to Digital Ticket View
+      document.getElementById("registration-form-wrapper").classList.add("hidden");
+      document.getElementById("registration-ticket-wrapper").classList.remove("hidden");
+      showTicketDetails(passObj);
+
+      renderEvents();
+      updatePassCounters();
+      showToast(`Registered for ${ev.title}! Pass #${passObj.passId} generated.`, "success");
+    }
+
+    function showTicketDetails(passObj) {
+      lastGeneratedPassId = passObj.passId;
+      document.getElementById("ticket-pass-id").textContent = `#${passObj.passId}`;
+      document.getElementById("ticket-student-name").textContent = passObj.studentName;
+      document.getElementById("ticket-student-roll").textContent = passObj.studentRoll;
+      document.getElementById("ticket-student-dept").textContent = passObj.studentDept;
+    }
+
+    function copyPassCode() {
+      if (!lastGeneratedPassId) return;
+      const tempInput = document.createElement("input");
+      tempInput.value = lastGeneratedPassId;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      showToast(`Pass ID #${lastGeneratedPassId} copied to clipboard!`, "success");
+    }
+
+    // =========================================================================
+    // 7. HOST / SUBMIT NEW EVENT MODAL LOGIC
+    // =========================================================================
+    function openHostModal() {
+      const modal = document.getElementById("host-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeHostModal() {
+      const modal = document.getElementById("host-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    }
+
+    function submitNewEvent(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("host-title").value.trim();
+      const category = document.getElementById("host-category").value;
+      const club = document.getElementById("host-club").value.trim();
+      const dateTimeRaw = document.getElementById("host-datetime").value.trim();
+      const statusLabel = document.getElementById("host-entry-type").value;
+      const venue = document.getElementById("host-venue").value.trim();
+      const coordinator = document.getElementById("host-coordinator").value.trim();
+      const description = document.getElementById("host-description").value.trim();
+
+      const categoryStyles = {
+        "Tech & Hackathons": { gradient: "from-indigo-600 via-blue-600 to-cyan-500", icon: "fa-code" },
+        "Workshops": { gradient: "from-emerald-600 via-teal-600 to-cyan-600", icon: "fa-microchip" },
+        "Cultural": { gradient: "from-fuchsia-600 via-pink-600 to-rose-500", icon: "fa-music" },
+        "Sports": { gradient: "from-amber-500 via-orange-600 to-red-600", icon: "fa-trophy" },
+        "Seminars": { gradient: "from-purple-600 via-violet-600 to-indigo-600", icon: "fa-microphone-lines" }
+      };
+
+      const style = categoryStyles[category] || categoryStyles["Tech & Hackathons"];
+      const parts = dateTimeRaw.split("•");
+      const detectedCampus = venue.toLowerCase().includes("uem") || club.toLowerCase().includes("uem") ? "UEM New Town" : "IEM Salt Lake";
+
+      const newEvent = {
+        id: Date.now(),
+        title,
+        category,
+        campus: detectedCampus,
+        club,
+        date: parts[0] ? parts[0].trim() : dateTimeRaw,
+        time: parts[1] ? parts[1].trim() : "10:00 AM IST",
+        venue,
+        statusLabel,
+        gradient: style.gradient,
+        icon: style.icon,
+        featured: false,
+        coordinator,
+        contact: "Verified Student Organizer • campus@iem-uem.edu.in",
+        description,
+        rules: [
+          "Carry a valid IEM/UEM student ID card for venue entry.",
+          "Report 15 minutes prior to the scheduled start time.",
+          "Digital registration pass is mandatory."
+        ]
+      };
+
+      events.unshift(newEvent);
+      document.getElementById("host-event-form").reset();
+      closeHostModal();
+      resetAllFilters();
+      updatePassCounters();
+
+      // Scroll smoothly to the newly added event
+      document.getElementById("events-section").scrollIntoView({ behavior: "smooth" });
+      showToast(`"${title}" is now live on the campus portal!`, "success");
+    }
+
+    // =========================================================================
+    // 8. MY PASSES WALLET MODAL
+    // =========================================================================
+    function openMyPassesModal() {
+      const container = document.getElementById("passes-list-container");
+      if (registeredPasses.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-2xl mx-auto mb-3">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <h4 class="font-bold text-slate-900 dark:text-white text-sm">No Event Passes Yet</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Register for any campus workshop, fest, or hackathon to get your instant entry pass.</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = registeredPasses
+          .map(
+            (p) => `
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-mono text-xs font-bold">#${p.passId}</span>
+                <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>Confirmed</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-slate-900 dark:text-white">${p.eventTitle}</h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${p.eventDate} • ${p.eventVenue}</p>
+              <div class="pt-2 mt-1 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-700 dark:text-slate-300">${p.studentName} (${p.studentRoll})</span>
+                <button onclick="closeMyPassesModal(); openEventModal(${p.eventId})" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Open Ticket</button>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+      }
+
+      const modal = document.getElementById("passes-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMyPassesModal() {
+      const modal = document.getElementById("passes-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    }
+
+    // =========================================================================
+    // 9. TOAST NOTIFICATION SYSTEM
+    // =========================================================================
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      const bgClass = type === "error" ? "bg-rose-600" : "bg-slate-900 dark:bg-blue-600";
+      const iconClass = type === "error" ? "fa-circle-exclamation" : "fa-circle-check";
+
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl ${bgClass} text-white text-xs sm:text-sm font-semibold shadow-xl transition-all duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${iconClass}"></i><span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("translate-y-2", "opacity-0");
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Close modals on Escape key press
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeEventModal();
+        closeHostModal();
+        closeMyPassesModal();
+      }
+    });
+  </script>
+</body>
+</html>
